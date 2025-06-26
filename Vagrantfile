@@ -2,6 +2,7 @@ Vagrant.configure("2") do |config|
   config.vm.box = "oraclelinux/8"
   config.vm.box_url = "https://oracle.github.io/vagrant-projects/boxes/oraclelinux/8.json"
   config.vm.hostname = "oracle-xe"
+  config.vm.box_check_update = false
 
   config.vm.network "forwarded_port", guest: 1521, host: 1521, auto_correct: true  # Oracle DB listener
   config.vm.network "forwarded_port", guest: 5500, host: 5500, auto_correct: true  # EM Express web UI
