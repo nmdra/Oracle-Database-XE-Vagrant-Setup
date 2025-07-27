@@ -5,7 +5,7 @@ This guide provides a complete setup for installing and configuring Oracle Datab
 
 ## Vagrant Setup
 
-Download the `oracle-database-xe-21c-1.0-1.ol8.x86_64.rpm` and `oracle-database-preinstall-21c-1.0-1.el8.x86_64.rpm` from Oracle’s official site and place it in the same folder.
+Download the [`oracle-database-xe-21c-1.0-1.ol8.x86_64.rpm`](https://download.oracle.com/otn-pub/otn_software/db-express/oracle-database-xe-21c-1.0-1.ol8.x86_64.rpm) and `oracle-database-preinstall-21c-1.0-1.el8.x86_64.rpm` from Oracle’s official site and place it in the same folder.
 
 ```bash
 vagrant up 
