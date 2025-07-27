@@ -1,37 +1,89 @@
 #!/bin/bash
 set -e
 
-echo "🔁 Updating YUM cache and system packages..."
+################################################################################
+# Oracle XE 21c Automated Installation Script
+# Author: NIMENDRA
+################################################################################
+
+echo "================================================================================"
+echo " Starting Oracle XE 21c installation..."
+echo " This process may take several minutes, especially during the first run."
+echo "================================================================================"
+
+# Step 1: Update YUM cache and system packages
+echo "[Step 1] Updating YUM cache and upgrading system packages..."
 yum makecache -y
 yum update -y
 
-echo "🔧 Installing Oracle preinstall RPM..."
+# Step 2: Install Oracle preinstall package
+echo "[Step 2] Installing Oracle preinstallation RPM..."
 
-# Use preinstall package (Oracle officially supports this on Oracle Linux 8)
-yum localinstall -y /vagrant/oracle-database-preinstall-21c-1.0-1.el8.x86_64.rpm
+PREINSTALL_RPM="/vagrant/oracle-database-preinstall-21c-1.0-1.el8.x86_64.rpm"
+if [[ -f "$PREINSTALL_RPM" ]]; then
+    echo "Found preinstall RPM: $PREINSTALL_RPM"
+    yum localinstall -y "$PREINSTALL_RPM"
+else
+    echo "Preinstall RPM not found in /vagrant. Installing via dnf instead..."
+    dnf install -y oracle-database-preinstall-21c
+fi
 
-echo "📦 Installing Oracle XE 21c RPM..."
-yum localinstall -y /vagrant/oracle-database-xe-21c-1.0-1.ol8.x86_64.rpm
+# Step 3: Install Oracle XE 21c RPM
+echo "[Step 3] Installing Oracle XE 21c RPM..."
 
-echo "⚙️ Configuring Oracle XE..."
+ORACLE_XE_RPM="/vagrant/oracle-database-xe-21c-1.0-1.ol8.x86_64.rpm"
+if [[ -f "$ORACLE_XE_RPM" ]]; then
+    echo "Found Oracle XE RPM: $ORACLE_XE_RPM"
+    yum localinstall -y "$ORACLE_XE_RPM"
+else
+    echo "ERROR: Oracle XE RPM not found at $ORACLE_XE_RPM"
+    echo "Please download it manually from:"
+    echo "  https://download.oracle.com/otn-pub/otn_software/db-express/oracle-database-xe-21c-1.0-1.ol8.x86_64.rpm"
+    echo "and place it in the /vagrant directory."
+    exit 1
+fi
 
+# Step 4: Configure Oracle Database
+echo "[Step 4] Configuring Oracle XE..."
 ORACLE_PASSWORD=Oracle123 \
   ORACLE_CONFIRM_PASSWORD=Oracle123 \
   ORACLE_CHARACTERSET=AL32UTF8 \
   /etc/init.d/oracle-xe-21c configure
 
-echo "✅ Setting Oracle environment for vagrant user..."
-cat <<EOF >>/home/vagrant/.bashrc
+# Step 5: Add Oracle environment variables to vagrant user's .bashrc
+echo "[Step 5] Setting Oracle environment variables for vagrant user..."
+cat <<EOF >> /home/vagrant/.bashrc
 
-# Oracle XE environment
+# Oracle XE environment setup
 export ORACLE_HOME=/opt/oracle/product/21c/dbhomeXE
 export ORACLE_SID=XE
-export PATH=$PATH:/opt/oracle/product/21c/dbhomeXE/bin/
-export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/opt/oracle/product/21c/dbhomeXE/lib/
+export PATH=\$PATH:/opt/oracle/product/21c/dbhomeXE/bin/
+export LD_LIBRARY_PATH=\$LD_LIBRARY_PATH:/opt/oracle/product/21c/dbhomeXE/lib/
 EOF
 
-echo "✅ Oracle XE 21c is installed and ready to use!"
-echo "🔐 Default credentials:"
-echo "    - Username: SYSTEM"
-echo "    - Password: Oracle123"
-echo "    - Connect with: sqlplus system/Oracle123@//localhost:1521/XE"
+# Step 6: Verify Oracle service is running
+echo "[Step 6] Checking Oracle XE service status..."
+
+if systemctl is-active --quiet oracle-xe-21c; then
+    echo "Oracle XE service is active."
+else
+    echo "ERROR: Oracle XE service is not running!"
+    echo "Try restarting with: sudo systemctl start oracle-xe-21c"
+    exit 1
+fi
+
+# Step 7: Run a test SQL query to verify connection
+echo "[Step 7] Verifying Oracle XE connection with a test query..."
+
+echo "SELECT 'Hello, Oracle!' AS test_message FROM dual;" | \
+  sqlplus -s system/Oracle123@//localhost:1521/XE
+
+# Done
+echo "================================================================================"
+echo " Oracle XE 21c installation and verification complete!"
+echo
+echo " Default connection details:"
+echo "   - Username : SYSTEM"
+echo "   - Password : Oracle123"
+echo "   - Connect  : sqlplus system/Oracle123@//localhost:1521/XE"
+echo "================================================================================"
