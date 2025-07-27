@@ -209,7 +209,7 @@ sqlplus system/Oracle123@//192.168.56.38:1521/XE
  
 ---
 <div align="center">
-  <a href="blog.nimendra.xyz"> 🌎 nmdra.xyz</a> |
+  <a href="https://blog.nimendra.xyz"> 🌎 nmdra.xyz</a> |
   <a href="https://github.com/nmdra"> 👨‍💻 Github</a> |
   <a href="https://twitter.com/nimendra_"> 🐦 Twitter</a>
 </div>
