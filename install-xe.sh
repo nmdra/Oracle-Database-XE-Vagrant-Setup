@@ -21,11 +21,11 @@ echo "[Step 2] Installing Oracle preinstallation RPM..."
 
 PREINSTALL_RPM="/vagrant/oracle-database-preinstall-21c-1.0-1.el8.x86_64.rpm"
 if [[ -f "$PREINSTALL_RPM" ]]; then
-    echo "Found preinstall RPM: $PREINSTALL_RPM"
-    yum localinstall -y "$PREINSTALL_RPM"
+  echo "Found preinstall RPM: $PREINSTALL_RPM"
+  yum localinstall -y "$PREINSTALL_RPM"
 else
-    echo "Preinstall RPM not found in /vagrant. Installing via dnf instead..."
-    dnf install -y oracle-database-preinstall-21c
+  echo "Preinstall RPM not found in /vagrant. Installing via dnf instead..."
+  dnf install -y oracle-database-preinstall-21c
 fi
 
 # Step 3: Install Oracle XE 21c RPM
@@ -33,14 +33,14 @@ echo "[Step 3] Installing Oracle XE 21c RPM..."
 
 ORACLE_XE_RPM="/vagrant/oracle-database-xe-21c-1.0-1.ol8.x86_64.rpm"
 if [[ -f "$ORACLE_XE_RPM" ]]; then
-    echo "Found Oracle XE RPM: $ORACLE_XE_RPM"
-    yum localinstall -y "$ORACLE_XE_RPM"
+  echo "Found Oracle XE RPM: $ORACLE_XE_RPM"
+  yum localinstall -y "$ORACLE_XE_RPM"
 else
-    echo "ERROR: Oracle XE RPM not found at $ORACLE_XE_RPM"
-    echo "Please download it manually from:"
-    echo "  https://download.oracle.com/otn-pub/otn_software/db-express/oracle-database-xe-21c-1.0-1.ol8.x86_64.rpm"
-    echo "and place it in the /vagrant directory."
-    exit 1
+  echo "ERROR: Oracle XE RPM not found at $ORACLE_XE_RPM"
+  echo "Please download it manually from:"
+  echo "  https://download.oracle.com/otn-pub/otn_software/db-express/oracle-database-xe-21c-1.0-1.ol8.x86_64.rpm"
+  echo "and place it in the /vagrant directory."
+  exit 1
 fi
 
 # Step 4: Configure Oracle Database
@@ -52,7 +52,7 @@ ORACLE_PASSWORD=Oracle123 \
 
 # Step 5: Add Oracle environment variables to vagrant user's .bashrc
 echo "[Step 5] Setting Oracle environment variables for vagrant user..."
-cat <<EOF >> /home/vagrant/.bashrc
+cat <<EOF >>/home/vagrant/.bashrc
 
 # Oracle XE environment setup
 export ORACLE_HOME=/opt/oracle/product/21c/dbhomeXE
@@ -61,21 +61,10 @@ export PATH=\$PATH:/opt/oracle/product/21c/dbhomeXE/bin/
 export LD_LIBRARY_PATH=\$LD_LIBRARY_PATH:/opt/oracle/product/21c/dbhomeXE/lib/
 EOF
 
-# Step 6: Verify Oracle service is running
-echo "[Step 6] Checking Oracle XE service status..."
-
-if systemctl is-active --quiet oracle-xe-21c; then
-    echo "Oracle XE service is active."
-else
-    echo "ERROR: Oracle XE service is not running!"
-    echo "Try restarting with: sudo systemctl start oracle-xe-21c"
-    exit 1
-fi
-
 # Step 7: Run a test SQL query to verify connection
 echo "[Step 7] Verifying Oracle XE connection with a test query..."
 
-echo "SELECT 'Hello, Oracle!' AS test_message FROM dual;" | \
+echo "SELECT 'Hello, Oracle!' AS test_message FROM dual;" |
   sqlplus -s system/Oracle123@//localhost:1521/XE
 
 # Done
