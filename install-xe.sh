@@ -57,8 +57,7 @@ cat <<EOF >>/home/vagrant/.bashrc
 # Oracle XE environment setup
 export ORACLE_HOME=/opt/oracle/product/21c/dbhomeXE
 export ORACLE_SID=XE
-export PATH=\$PATH:/opt/oracle/product/21c/dbhomeXE/bin/
-export LD_LIBRARY_PATH=\$LD_LIBRARY_PATH:/opt/oracle/product/21c/dbhomeXE/lib/
+export PATH=$ORACLE_HOME/bin:$PATH
 EOF
 
 # Step 7: Run a test SQL query to verify connection
